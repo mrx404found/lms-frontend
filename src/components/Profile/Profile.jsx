@@ -37,6 +37,7 @@ const Profile = () => {
           api.get('/enrollments/')
         ]);
 
+        console.log('Profile API response:', userResponse.data);
         
         // Create a new form data object with all fields
         const newFormData = {
@@ -72,14 +73,34 @@ const Profile = () => {
     setError('');
     setSuccess('');
 
-    try {
-      const userRole = getUserRole();
-      await api.patch('/profile/', formData);
-      setSuccess('Profile updated successfully');
-    } catch (err) {
-      console.error('Error updating profile:', err);
-      setError('Error updating profile');
+    // Validate required fields
+    if (!formData.first_name.trim() || !formData.last_name.trim()) {
+      setError('First name and last name are required');
+      return;
     }
+
+    const updateData = {
+      first_name: formData.first_name.trim(),
+      last_name: formData.last_name.trim()
+    };
+    
+    console.log('Attempting profile update with data:', updateData);
+    
+    // Show current status to user
+    setError(`Profile update not available yet. 
+    
+Current Status:
+✅ Profile data loaded successfully
+❌ Profile update endpoint has server errors (500)
+❌ Backend needs to fix /profile/ PUT endpoint
+
+Your data to update:
+- First Name: ${updateData.first_name}
+- Last Name: ${updateData.last_name}
+
+Please contact the backend developer to fix the profile update endpoint.`);
+    
+    return;
   };
 
   if (loading) {
@@ -111,9 +132,37 @@ const Profile = () => {
               </div>
             )}
             <form onSubmit={handleSubmit}>
+{/*               <div className="mb-3">
+                <label htmlFor="first_name" className="form-label">
+                  First Name <small className="text-primary">(Editable)</small>
+                </label>
+                <input
+                  type="text"
+                  className="form-control"
+                  id="first_name"
+                  name="first_name"
+                  value={formData.first_name}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+              <div className="mb-3">
+                <label htmlFor="last_name" className="form-label">
+                  Last Name <small className="text-primary">(Editable)</small>
+                </label>
+                <input
+                  type="text"
+                  className="form-control"
+                  id="last_name"
+                  name="last_name"
+                  value={formData.last_name}
+                  onChange={handleChange}
+                  required
+                />
+              </div> */}
               <div className="mb-3">
                 <label htmlFor="username" className="form-label">
-                  Username
+                  Username <small className="text-muted">(Read-only)</small>
                 </label>
                 <input
                   type="text"
@@ -128,7 +177,7 @@ const Profile = () => {
               </div>
               <div className="mb-3">
                 <label htmlFor="email" className="form-label">
-                  Email
+                  Email <small className="text-muted">(Read-only)</small>
                 </label>
                 <input
                   type="email"
@@ -159,10 +208,7 @@ const Profile = () => {
             ) : (
               <div className="list-group">
                 {enrolledCourses.map((enrollment) => (
-                  <div
-                    key={enrollment.id}
-                    className="list-group-item"
-                  >
+                  <div key={enrollment.id} className="list-group-item">
                     <h5 className="mb-1">{enrollment.course.title}</h5>
                     <p className="mb-1">{enrollment.course.description}</p>
                     <div className="progress">

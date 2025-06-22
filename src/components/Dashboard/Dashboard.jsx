@@ -24,16 +24,17 @@ const Dashboard = () => {
     fetchEnrollments();
   }, [api, location]);
 
-  const calculateProgress = (enrollment) => {
-    if (!enrollment.total_lessons) return 0;
-    return Math.round((enrollment.completed_lessons / enrollment.total_lessons) * 100);
-  };
+  console.log('Enrollments:', enrollments);
+  
+  // Debug: Log first enrollment structure
+  if (enrollments.length > 0) {
+    console.log('First enrollment structure:', enrollments[0]);
+    console.log('First enrollment keys:', Object.keys(enrollments[0]));
+  }
 
   const averageProgress = enrollments.length > 0
-    ? Math.round(enrollments.reduce((acc, e) => acc + calculateProgress(e), 0) / enrollments.length)
+    ? Math.round(enrollments.reduce((acc, e) => acc + (e.progress || 0), 0) / enrollments.length)
     : 0;
-
-  console.log('Enrollments:', enrollments);
 
   return (
     <div className="container mt-4">
@@ -130,8 +131,7 @@ const Dashboard = () => {
 
                           <div className="d-flex justify-content-between align-items-center">
                             <small className="text-muted">
-                              {enrollment.completed_lessons || 0} of{" "}
-                              {enrollment.total_lessons || 0} lessons
+                              {enrollment.progress || 0}% completed
                             </small>
                             {enrollment.course?.id && (
                               <Link
@@ -173,7 +173,7 @@ const Dashboard = () => {
                 <div className="col-6">
                   <div className="progress-circle mb-2">
                     {
-                      enrollments.filter((e) => calculateProgress(e) === 100)
+                      enrollments.filter((e) => e.progress === 100)
                         .length
                     }
                   </div>
@@ -184,7 +184,7 @@ const Dashboard = () => {
               <hr />
               <p className="text-center">⭐⭐⭐⭐⭐</p>
 
- {/*              <div className="text-center">
+              <div className="text-center">
                 <h6
                   style={{
                     fontFamily: "Segoe UI, Arial, sans-serif",
@@ -209,7 +209,7 @@ const Dashboard = () => {
                 <small className="text-muted">
                   {averageProgress}% Average Completion
                 </small>
-              </div> */}
+              </div>
             </div>
           </div>
 
