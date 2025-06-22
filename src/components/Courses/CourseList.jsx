@@ -80,21 +80,18 @@ const CourseList = () => {
                     {course.description?.length > 100 ? '...' : ''}
                   </p>
                   <div className="d-flex justify-content-between align-items-center">
-                    <small className="text-muted">
-                      {course.total_lessons || 0} lessons
-                    </small>
                     <Link to={`/courses/${course.id}`} className="btn btn-primary">
                       View Course
                     </Link>
                   </div>
                 </div>
-                {course.instructor && (
-                  <div className="card-footer bg-transparent">
+{/*                {course.instructor && ( 
+                   <div className="card-footer bg-transparent">
                     <small className="text-muted">
                       Instructor: {course.instructor.first_name} {course.instructor.last_name}
                     </small>
-                  </div>
-                )}
+                  </div> 
+                )}*/}
               </div>
             </div>
           ))}
