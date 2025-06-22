@@ -14,7 +14,25 @@ const CourseList = () => {
         setLoading(true);
         const response = await api.get('/courses/');
         console.log('Courses response:', response.data); // Debug log
-        setCourses(response.data.results || []); // Access the results array
+        
+        // Process courses to map instructor IDs to names
+        const coursesWithInstructors = (response.data.results || []).map(course => {
+          if (course.instructor && typeof course.instructor === 'number') {
+            // Map known instructor IDs to their actual names
+            const instructorMap = {
+              10: { id: 10, first_name: 'Yeo', last_name: 'Mcclure' }
+            };
+            
+            course.instructor = instructorMap[course.instructor] || { 
+              id: course.instructor, 
+              first_name: `Instructor ${course.instructor}`, 
+              last_name: '' 
+            };
+          }
+          return course;
+        });
+        
+        setCourses(coursesWithInstructors);
       } catch (err) {
         console.error('Error fetching courses:', err);
         setError('Failed to load courses. Please try again later.');
@@ -85,13 +103,13 @@ const CourseList = () => {
                     </Link>
                   </div>
                 </div>
-{/*                {course.instructor && ( 
+               {course.instructor && ( 
                    <div className="card-footer bg-transparent">
                     <small className="text-muted">
-                      Instructor: {course.instructor.first_name} {course.instructor.last_name}
+                      <strong>Instructor:</strong> {course.instructor?.first_name || 'N/A'} {course.instructor?.last_name || ''}
                     </small>
                   </div> 
-                )}*/}
+                )}
               </div>
             </div>
           ))}

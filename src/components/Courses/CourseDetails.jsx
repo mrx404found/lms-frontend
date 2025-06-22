@@ -22,6 +22,24 @@ const useCourseApi = (api, courseId) => {
         throw new Error('Course not found');
       }
       
+      console.log('Course data:', foundCourse); // Debug log
+      console.log('Instructor data:', foundCourse.instructor); // Debug log
+      
+      // If instructor is just an ID, create a simple display object
+      if (foundCourse.instructor && typeof foundCourse.instructor === 'number') {
+        // Map known instructor IDs to their actual names
+        const instructorMap = {
+          10: { id: 10, first_name: 'Yeo', last_name: 'Mcclure' }
+        };
+        
+        foundCourse.instructor = instructorMap[foundCourse.instructor] || { 
+          id: foundCourse.instructor, 
+          first_name: `Instructor ${foundCourse.instructor}`, 
+          last_name: '' 
+        };
+        console.log('Created instructor display object:', foundCourse.instructor);
+      }
+      
       setCourse(foundCourse);
       await checkEnrollmentStatus();
     } catch (err) {
@@ -105,7 +123,16 @@ const CourseHeader = ({ course, isEnrolled, onEnroll }) => (
       <p className="card-text">{course.description}</p>
       <div className="d-flex justify-content-between align-items-center">
         <div>
-          <strong>Instructor:</strong> {course.instructor?.first_name} {course.instructor?.last_name}
+          <strong>Instructor:</strong> {
+            course.instructor ? 
+              (typeof course.instructor === 'number' ? 
+                `Instructor ${course.instructor}` : 
+                (course.instructor.first_name || course.instructor.name || course.instructor.username || 'Unknown') + 
+                ' ' + 
+                (course.instructor.last_name || '')
+              )
+            : 'Not assigned'
+          }
         </div>
         <div>
           <strong>Category:</strong> {course.category?.title || 'Uncategorized'}
